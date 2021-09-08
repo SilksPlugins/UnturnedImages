@@ -1,8 +1,18 @@
+# Default repositories for different in-game asset categories.
+# If no override specifies a different repository, it will attempt to use the default repository.
 DefaultRepositories:
+  # The default repository for item images.
   Items: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/vanilla/items/{ItemId}.png"
 
+
+# Repository overrides for item images. Simply specify an ID, or list of IDs and their repository.
+# Remove the # before lines to uncomment them and have it work with the config.
+# Priority is based on which line is first. For example, if all lines below were uncommented,
+# the image URL for the item with an ID of 46001 would be https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/other2/items/{ItemId}.png
 ItemOverrides:
-#- Id: 46000
-#  Repository: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/other/items/{ItemId}.png"
-#- Id: "46001-47000"
+#- Id: 46000 # The ID of the override.
+#  Repository: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/other/items/{ItemId}.png" # The repository of the override.
+#- Id: "46001-47000" # A range of IDs can be specified as well. You can specify multiple IDs using ranges. and multiple ranges by separating them with commas (',') or semi-colons (';').
 #  Repository: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/other2/items/{ItemId}.png"
+#- Id: "46001-47000;48000-49000;50023" # A range of IDs can be specified as well. You can specify multiple ranges/IDs by separating them with commas (',') or semi-colons (';').
+#  Repository: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/other3/items/{ItemId}.png"
