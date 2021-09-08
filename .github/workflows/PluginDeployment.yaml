@@ -33,5 +33,5 @@ jobs:
     - name: Push to GitHub
       run: dotnet nuget push UnturnedImages/bin/Release/*.nupkg
              --api-key ${{ secrets.GITHUB_TOKEN }}
-             --source https://nuget.pkg.github.com/SilKsPlugins/index.json
+             --source https://nuget.pkg.github.com/silksplugins/index.json
              --skip-duplicate
