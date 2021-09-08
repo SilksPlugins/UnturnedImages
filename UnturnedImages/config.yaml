@@ -1,0 +1,8 @@
+DefaultRepositories:
+  Items: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/vanilla/items/{ItemId}.png"
+
+ItemOverrides:
+#- Id: 46000
+#  Repository: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/other/items/{ItemId}.png"
+#- Id: "46001-47000"
+#  Repository: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/other2/items/{ItemId}.png"

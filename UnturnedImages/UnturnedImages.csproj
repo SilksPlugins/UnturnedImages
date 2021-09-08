@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net461</TargetFramework>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<PackageId>SilK.UnturnedImages</PackageId>
+		<PackageDescription>An OpenMod plugin for Unturned which adds a repository of images available to plugins for usage in UIs.</PackageDescription>
+		<PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+		<PackageAuthor>Stephen White</PackageAuthor>
+		<PackageTags>openmod openmod-plugin universal shops</PackageTags>
+		<Version>0.0.0</Version>
+		<RepositoryUrl>https://github.com/IAmSilK/SilK.UnturnedImages</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<GenerateNugetPackage>true</GenerateNugetPackage>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<Authors>Stephen White</Authors>
+		<Copyright>Copyright © Stephen White 2021</Copyright>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<LangVersion>9.0</LangVersion>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>nullable</WarningsAsErrors>
+		<NoWarn>$(NoWarn);NU1701;NU1702;CS0436</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net461" Version="1.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="OpenMod.Unturned" Version="3.2.0" />
+		<PackageReference Include="SilK.Unturned.Extras" Version="1.6.5" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="config.yaml" />
+	</ItemGroup>
+
+	<Target Name="ChangeAliasesOfNugetRefs" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
+		<ItemGroup>
+			<ReferencePath Condition="'%(FileName)' == 'JetBrains.Annotations'">
+				<Aliases>JetBrainsAnnotations</Aliases>
+			</ReferencePath>
+		</ItemGroup>
+	</Target>
+
+</Project>
