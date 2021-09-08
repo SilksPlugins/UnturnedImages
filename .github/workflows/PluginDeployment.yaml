@@ -1,0 +1,37 @@
+name: Unturned Images Plugin Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Plugin Version (SemVer: https://semver.org)'
+        required: true
+jobs:
+  deploy:
+    name: "NuGet Deployment"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout Repository
+      with:
+        fetch-depth: 0
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Update version
+      run: "sed -i \"s#<Version>0.0.0</Version>#<Version>${{ github.event.inputs.version }}</Version>#\" UnturnedImages/UnturnedImages.csproj"  
+    - name: Build
+      run: dotnet build UnturnedImages/UnturnedImages.csproj --configuration Release --no-restore
+    - name: Push to NuGet
+      run: dotnet nuget push UnturnedImages/bin/Release/*.nupkg
+             --api-key ${{ secrets.NUGET_DEPLOY_KEY }}
+             --source https://api.nuget.org/v3/index.json
+             --skip-duplicate
+    - name: Push to GitHub
+      run: dotnet nuget push UnturnedImages/bin/Release/*.nupkg
+             --api-key ${{ secrets.GH_DEPLOY_KEY }}
+             --source https://nuget.pkg.github.com/SilKsPlugins/index.json
+             --skip-duplicate
