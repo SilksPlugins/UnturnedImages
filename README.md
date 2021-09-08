@@ -13,9 +13,12 @@ This project is public and free to anyone to be used by anyone and pull requests
 
 ## Usage
 
-To access images, it's recommended to use the [jsDeliver CDN](https://www.jsdelivr.com/?docs=gh). For item images, it's as simple as substituting the item ID in the following example:
+To access images, it's recommended to use the [jsDeliver CDN](https://www.jsdelivr.com/?docs=gh). For item images, it's as simple as substituting the item ID in the following example.
 
-Eaglefire (item ID 4):
+
+When an image for the ID doesn't exist, the HTTP GET request will return a 404 error code.
+
+Eaglefire image URL (item ID 4):
 ```
 https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/vanilla/items/4.png
 ```
