@@ -3,6 +3,8 @@ A repository of images for assets in the game Unturned.
 
 Images are available on the [images branch](https://github.com/SilKsPlugins/UnturnedImages/tree/images).
 
+For information on contributing, [see the contributing page](/CONTRIBUTING.md).
+
 ## Purpose
 
 Unturned Images is a public, open-source repository of images of in-game assets to be used either by plugins or websites.
