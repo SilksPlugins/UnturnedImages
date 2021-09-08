@@ -9,7 +9,7 @@ For information on contributing, [see the contributing page](/CONTRIBUTING.md).
 
 Unturned Images is a public, open-source repository of images of in-game assets to be used either by plugins or websites.
 
-These are accessible via the [jsDeliver CDN](https://www.jsdelivr.com/?docs=gh). For an example, view the [Usage section](#Usage).
+The asset images are accessible via the [jsDeliver CDN](https://www.jsdelivr.com/?docs=gh). For an example, view the [Usage section](#Usage).
 
 This project is public and free to anyone to be used by anyone and pull requests will be reviewed.
 
@@ -27,5 +27,5 @@ https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/vanilla/items/4.pn
 
 ## Plans
 
-- [ ] Images of vehicles are planned, however a method of retrieving these images is being worked on.
+- [ ] Images of vehicles are planned, however, a method of retrieving these images is being worked on.
 - [ ] Modded assets are planned and will likely start with the most popular mods (i.e. Elver). After which pull requests to add images for other mods will be accepted.
