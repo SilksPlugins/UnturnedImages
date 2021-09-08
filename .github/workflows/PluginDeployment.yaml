@@ -32,6 +32,6 @@ jobs:
              --skip-duplicate
     - name: Push to GitHub
       run: dotnet nuget push UnturnedImages/bin/Release/*.nupkg
-             --api-key ${{ secrets.GH_DEPLOY_KEY }}
+             --api-key ${{ secrets.GITHUB_TOKEN }}
              --source https://nuget.pkg.github.com/SilKsPlugins/index.json
              --skip-duplicate
