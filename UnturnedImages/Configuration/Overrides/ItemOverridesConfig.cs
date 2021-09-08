@@ -11,6 +11,6 @@ namespace UnturnedImages.Configuration.Overrides
         /// The multiple override configs for item assets.
         /// Priority is the lower the index, the more prioritized it is.
         /// </summary>
-        public ICollection<OverrideConfig> Items { get; set; } = new List<OverrideConfig>();
+        public ICollection<OverrideConfig> ItemOverrides { get; set; } = new List<OverrideConfig>();
     }
 }

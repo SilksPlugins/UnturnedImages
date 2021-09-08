@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenMod.API.Ioc;
 using OpenMod.API.Prioritization;
+using OpenMod.Core.Events;
 using OpenMod.Core.Plugins.Events;
 using SDG.Unturned;
 using SilK.Unturned.Extras.Configuration;
@@ -23,6 +24,7 @@ namespace UnturnedImages.Items
     /// </summary>
     [ServiceImplementation(Lifetime = ServiceLifetime.Singleton, Priority = Priority.Lowest)]
     public class ItemImageDirectory : IItemImageDirectorySync, IItemImageDirectoryAsync,
+        IInstanceEventListener<OpenModInitializedEvent>,
         IInstanceEventListener<PluginConfigurationChangedEvent>
     {
         internal class RepositoryOverride
@@ -53,17 +55,24 @@ namespace UnturnedImages.Items
 
             _defaultItemRepository = null;
             _overrideRepositories = new List<RepositoryOverride>();
+
+            ParseConfig();
         }
 
         private void ParseConfig()
         {
-            var overrides = new List<RepositoryOverride>();
+            var config = _configuration.GetNullableInstance();
 
-            var config = _configuration.GetInstance();
+            if (config == null)
+            {
+                return;
+            }
+
+            var overrides = new List<RepositoryOverride>();
 
             var itemOverridesConfig = config.Get<ItemOverridesConfig>();
 
-            foreach (var overrideConfig in itemOverridesConfig.Items)
+            foreach (var overrideConfig in itemOverridesConfig.ItemOverrides)
             {
                 var range = RangeHelper.ParseMulti(overrideConfig.Id);
                 var repository = overrideConfig.Repository;
@@ -73,8 +82,16 @@ namespace UnturnedImages.Items
                 overrides.Add(@override);
             }
 
-            _defaultItemRepository = config.GetValue<string?>("DefaultRepositories", null);
+            _defaultItemRepository = config.GetValue<string?>("DefaultRepositories:Items", null);
             _overrideRepositories = overrides;
+        }
+
+        /// <inheritdoc />
+        public UniTask HandleEventAsync(object? sender, OpenModInitializedEvent @event)
+        {
+            ParseConfig();
+
+            return UniTask.CompletedTask;
         }
 
         /// <inheritdoc />

@@ -4,7 +4,6 @@ DefaultRepositories:
   # The default repository for item images.
   Items: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/vanilla/items/{ItemId}.png"
 
-
 # Repository overrides for item images. Simply specify an ID, or list of IDs and their repository.
 # Remove the # before lines to uncomment them and have it work with the config.
 # Priority is based on which line is first. For example, if all lines below were uncommented,
