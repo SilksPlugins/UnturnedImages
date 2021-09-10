@@ -3,6 +3,8 @@ using JetBrains.Annotations;
 using SDG.Unturned;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -112,6 +114,15 @@ namespace UnturnedImages.Module.UI
                 AddElement(Glazier.Get().CreateButton, reloadModuleButton =>
                 {
                     reloadModuleButton.positionOffset_Y = 250;
+                    reloadModuleButton.text = "Open Extras Folder";
+                    reloadModuleButton.onClickedButton += OnClickedOpenExtrasFolder;
+                });
+
+                // Button - Reload Module
+
+                AddElement(Glazier.Get().CreateButton, reloadModuleButton =>
+                {
+                    reloadModuleButton.positionOffset_Y = 300;
                     reloadModuleButton.text = "Reload Module";
                     reloadModuleButton.onClickedButton += OnClickedReloadModule;
                 });
@@ -154,6 +165,13 @@ namespace UnturnedImages.Module.UI
         {
             IconUtils.CreateExtrasDirectory();
             ImageUtils.CaptureAllItemImages();
+        }
+
+        private void OnClickedOpenExtrasFolder(ISleekElement button)
+        {
+            var path = Path.Combine(ReadWrite.PATH, "Extras");
+
+            Process.Start("explorer", path);
         }
 
         private void OnClickedReloadModule(ISleekElement button)
