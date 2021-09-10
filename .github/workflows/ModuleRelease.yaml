@@ -41,6 +41,17 @@ jobs:
         zip -qr ./Release.zip UnturnedImages
       shell: bash
 
+    - name: Create release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.event.inputs.version }}
+        release_name: "UnturnedImages.Module v${{ github.event.inputs.version }}"
+        draft: true
+        prerelease: false
+        
     - name: Upload OpenMod release asset
       uses: actions/upload-release-asset@v1
       env:
