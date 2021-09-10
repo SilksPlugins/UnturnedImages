@@ -12,7 +12,7 @@ namespace UnturnedImages.Module
 
             foreach (var vehicleAsset in vehicleAssets)
             {
-                CustomVehicleTool.QueueVehicleIcon(vehicleAsset, 512, 512);
+                CustomVehicleTool.QueueVehicleIcon(vehicleAsset, 1024, 1024);
             }
         }
     }
