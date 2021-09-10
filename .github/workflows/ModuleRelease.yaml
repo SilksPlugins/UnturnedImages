@@ -19,6 +19,9 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+      
+    - name: Install zip
+      run: sudo apt-get install zip
         
     - name: Install dependencies
       run: dotnet restore
@@ -28,9 +31,6 @@ jobs:
       
     - name: Build
       run: dotnet build ./tools/UnturnedImages.Module/UnturnedImages.Module.csproj --configuration Release --no-restore
-      
-    - name: Install zip
-      run: sudo apt-get install zip
       
     - name: Zip OpenMod release artifacts
       run: |
