@@ -1,0 +1,53 @@
+name: Unturned Images Module Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Module Version (SemVer: https://semver.org)'
+        required: true
+        
+jobs:
+  deploy:
+    name: "GitHub Release"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout Repository
+        
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+        
+    - name: Install dependencies
+      run: dotnet restore
+      
+    - name: Update version
+      run: "sed -i \"s#<Version>0.0.0</Version>#<Version>${{ github.event.inputs.version }}</Version>#\" UnturnedImages/UnturnedImages.csproj"  
+      
+    - name: Build
+      run: dotnet build ./tools/UnturnedImages.Module/UnturnedImages.Module.csproj --configuration Release --no-restore
+      
+    - name: Install zip
+      run: sudo apt-get install zip
+      
+    - name: Zip OpenMod release artifacts
+      run: |
+        cd "./tools/UnturnedImages.Module/bin/Release/net461"
+        mkdir UnturnedImages
+        mv *.dll UnturnedImages
+        mv *.module UnturnedImages
+        cd ../../../../OpenMod
+        zip -qr ./Release.zip UnturnedImages
+      shell: bash
+
+    - name: Upload OpenMod release asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./Release.zip
+        asset_name: "UnturnedImages.Module-v${{ github.event.inputs.version }}.zip"
+        asset_content_type: application/zip
