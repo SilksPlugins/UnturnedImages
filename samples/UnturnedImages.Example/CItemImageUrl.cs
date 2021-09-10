@@ -1,4 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
+﻿extern alias JetBrainsAnnotations;
+using Cysharp.Threading.Tasks;
+using JetBrainsAnnotations::JetBrains.Annotations;
 using OpenMod.Core.Commands;
 using OpenMod.Unturned.Commands;
 using OpenMod.Unturned.Users;
@@ -8,6 +10,7 @@ using UnturnedImages.API.Items;
 
 namespace UnturnedImages.Example
 {
+    [UsedImplicitly]
     [Command("itemimageurl")]
     [CommandSyntax("<item ID>")]
     [CommandDescription("Gets the image URL for an item asset.")]

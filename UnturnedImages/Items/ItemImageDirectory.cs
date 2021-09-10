@@ -1,4 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
+﻿extern alias JetBrainsAnnotations;
+using Cysharp.Threading.Tasks;
+using JetBrainsAnnotations::JetBrains.Annotations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OpenMod.API.Ioc;
@@ -22,6 +24,7 @@ namespace UnturnedImages.Items
     /// Default implementation of <see cref="IItemImageDirectorySync"/>
     /// and <see cref="IItemImageDirectoryAsync"/> services.
     /// </summary>
+    [UsedImplicitly]
     [ServiceImplementation(Lifetime = ServiceLifetime.Singleton, Priority = Priority.Lowest)]
     public class ItemImageDirectory : IItemImageDirectorySync, IItemImageDirectoryAsync,
         IInstanceEventListener<OpenModInitializedEvent>,
