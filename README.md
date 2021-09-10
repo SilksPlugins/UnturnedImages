@@ -17,15 +17,18 @@ This project is public and free to anyone to be used by anyone and pull requests
 
 To access images, it's recommended to use the [jsDeliver CDN](https://www.jsdelivr.com/?docs=gh). For item images, it's as simple as substituting the item ID in the following example.
 
-
 When an image for the ID doesn't exist, the HTTP GET request will return a 404 error code.
 
 Eaglefire image URL (item ID 4):
 ```
-https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/vanilla/items/4.png
+https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedImages@images/vanilla/items/4.png
+```
+
+Blimp image URL (vehicle ID 189):
+```
+https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedImages@images/vanilla/vehicles/189.png
 ```
 
 ## Plans
 
-- [ ] Images of vehicles are planned, however, a method of retrieving these images is being worked on.
 - [ ] Modded assets are planned and will likely start with the most popular mods (i.e. Elver). After which pull requests to add images for other mods will be accepted.
