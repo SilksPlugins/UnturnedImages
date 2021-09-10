@@ -14,37 +14,37 @@ using SmartFormat;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using UnturnedImages.API.Items;
+using UnturnedImages.API.Vehicles;
 using UnturnedImages.Configuration.Overrides;
 using UnturnedImages.Ranges;
 using UnturnedImages.Repositories;
 
-namespace UnturnedImages.Items
+namespace UnturnedImages.Vehicles
 {
     /// <summary>
-    /// Default implementation of <see cref="IItemImageDirectorySync"/>
-    /// and <see cref="IItemImageDirectoryAsync"/> services.
+    /// Default implementation of <see cref="IVehicleImageDirectorySync"/>
+    /// and <see cref="IVehicleImageDirectoryAsync"/> services.
     /// </summary>
     [UsedImplicitly]
     [ServiceImplementation(Lifetime = ServiceLifetime.Singleton, Priority = Priority.Lowest)]
-    public class ItemImageDirectory : IItemImageDirectorySync, IItemImageDirectoryAsync,
+    public class VehicleImageDirectory : IVehicleImageDirectorySync, IVehicleImageDirectoryAsync,
         IInstanceEventListener<OpenModInitializedEvent>,
         IInstanceEventListener<PluginConfigurationChangedEvent>
     {
         private readonly IConfigurationAccessor<UnturnedImagesPlugin> _configuration;
 
-        private string? _defaultItemRepository;
+        private string? _defaultVehicleRepository;
         private List<RepositoryOverride> _overrideRepositories;
 
         /// <summary>
-        /// Constructs an item image directory.
+        /// Constructs a vehicle image directory.
         /// </summary>
         /// <param name="configuration">Configuration accessor for the Unturned Images plugin.</param>
-        public ItemImageDirectory(IConfigurationAccessor<UnturnedImagesPlugin> configuration)
+        public VehicleImageDirectory(IConfigurationAccessor<UnturnedImagesPlugin> configuration)
         {
             _configuration = configuration;
 
-            _defaultItemRepository = null;
+            _defaultVehicleRepository = null;
             _overrideRepositories = new List<RepositoryOverride>();
 
             ParseConfig();
@@ -61,9 +61,9 @@ namespace UnturnedImages.Items
 
             var overrides = new List<RepositoryOverride>();
 
-            var itemOverridesConfig = config.Get<ItemOverridesConfig>();
+            var vehicleOverridesConfig = config.Get<VehicleOverridesConfig>();
 
-            foreach (var overrideConfig in itemOverridesConfig.ItemOverrides)
+            foreach (var overrideConfig in vehicleOverridesConfig.VehicleOverrides)
             {
                 var range = RangeHelper.ParseMulti(overrideConfig.Id);
                 var repository = overrideConfig.Repository;
@@ -73,7 +73,7 @@ namespace UnturnedImages.Items
                 overrides.Add(@override);
             }
 
-            _defaultItemRepository = config.GetValue<string?>("DefaultRepositories:Items", null);
+            _defaultVehicleRepository = config.GetValue<string?>("DefaultRepositories:Vehicles", null);
             _overrideRepositories = overrides;
         }
 
@@ -94,14 +94,14 @@ namespace UnturnedImages.Items
         }
 
         /// <inheritdoc />
-        public string? GetItemImageUrlSync(ushort id, bool includeWorkshop)
+        public string? GetVehicleImageUrlSync(ushort id, bool includeWorkshop)
         {
             if (!includeWorkshop)
             {
-                // Verify item ID is not workshop
+                // Verify vehicle ID is not workshop
 
-                if (Assets.find(EAssetType.ITEM, id) is not ItemAsset itemAsset ||
-                    itemAsset.assetOrigin == EAssetOrigin.WORKSHOP)
+                if (Assets.find(EAssetType.VEHICLE, id) is not VehicleAsset vehicleAsset ||
+                    vehicleAsset.assetOrigin == EAssetOrigin.WORKSHOP)
                 {
                     return null;
                 }
@@ -109,16 +109,16 @@ namespace UnturnedImages.Items
 
             var @override = _overrideRepositories.FirstOrDefault(x => x.Range.IsWithin(id));
 
-            var repository = @override?.Repository ?? _defaultItemRepository;
+            var repository = @override?.Repository ?? _defaultVehicleRepository;
 
-            return repository == null ? null : Smart.Format(repository, new {ItemId = id});
+            return repository == null ? null : Smart.Format(repository, new {VehicleId = id});
         }
 
 
         /// <inheritdoc />
-        public Task<string?> GetItemImageUrlAsync(ushort id, bool includeWorkshop)
+        public Task<string?> GetVehicleImageUrlAsync(ushort id, bool includeWorkshop)
         {
-            return Task.FromResult(GetItemImageUrlSync(id, includeWorkshop));
+            return Task.FromResult(GetVehicleImageUrlSync(id, includeWorkshop));
         }
     }
 }

@@ -3,6 +3,8 @@
 DefaultRepositories:
   # The default repository for item images.
   Items: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/vanilla/items/{ItemId}.png"
+  # The default repository for vehicle images.
+  Vehicles: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/vanilla/vehicles/{VehicleId}.png"
 
 # Repository overrides for item images. Simply specify an ID, or list of IDs and their repository.
 # Remove the # before lines to uncomment them and have it work with the config.
@@ -15,3 +17,9 @@ ItemOverrides:
 #  Repository: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/other2/items/{ItemId}.png"
 #- Id: "46001-47000;48000-49000;50023" # A range of IDs can be specified as well. You can specify multiple ranges/IDs by separating them with commas (',') or semi-colons (';').
 #  Repository: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/other3/items/{ItemId}.png"
+
+# Repository overrides for vehicle images. Simply specify an ID, or list of IDs and their repository.
+# See the comments in the above ItemOverrides config for more information on configuring this.
+VehicleOverrides:
+#- Id: 46000 # The ID of the override.
+#  Repository: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/other/vehicle/{VehicleId}.png" # The repository of the override.
