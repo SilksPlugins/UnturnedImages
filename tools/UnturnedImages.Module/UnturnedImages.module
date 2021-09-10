@@ -1,0 +1,11 @@
+﻿{
+	"Name": "UnturnedImages",
+	"Version": "0.0.0.0",
+	"Assemblies":
+	[
+		{
+			"Path": "/UnturnedImages.Module.Bootstrapper.dll",
+			"Role": "Client"
+		}
+	]
+}

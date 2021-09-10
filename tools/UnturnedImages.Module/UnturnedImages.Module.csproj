@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net461</TargetFramework>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<LangVersion>9.0</LangVersion>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>nullable</WarningsAsErrors>
+		<NoWarn>$(NoWarn);NU1701;NU1702;CS0436</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Lib.Harmony" Version="2.1.1" />
+	  <PackageReference Include="OpenMod.UnityEngine.Redist" Version="2019.4.10">
+	    <IncludeAssets>compile</IncludeAssets>
+	  </PackageReference>
+	  <PackageReference Include="OpenMod.Unturned.Redist" Version="3.21.21">
+	    <IncludeAssets>compile</IncludeAssets>
+	  </PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="libs\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\UnturnedImages.Module.Bootstrapper\UnturnedImages.Module.Bootstrapper.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="SDG.Glazier.Runtime">
+	    <HintPath>libs\SDG.Glazier.Runtime.dll</HintPath>
+	    <Private>false</Private>
+	  </Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="UnturnedImages.module">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+</Project>

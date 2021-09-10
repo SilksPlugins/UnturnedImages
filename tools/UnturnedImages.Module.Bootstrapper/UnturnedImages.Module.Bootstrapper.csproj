@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net461</TargetFramework>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<LangVersion>9.0</LangVersion>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>nullable</WarningsAsErrors>
+		<NoWarn>$(NoWarn);NU1701;NU1702;CS0436</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="OpenMod.Unturned.Redist" Version="3.21.21" />
+		<PackageReference Include="dnlib" Version="3.3.4" />
+	</ItemGroup>
+
+</Project>
