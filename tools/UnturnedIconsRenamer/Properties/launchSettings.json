@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "UnturnedIconRenamer": {
-      "commandName": "Project",
-      "commandLineArgs": "-y -v C:\\SteamLibrary\\steamapps\\common\\Unturned"
-    }
-  }
-}
