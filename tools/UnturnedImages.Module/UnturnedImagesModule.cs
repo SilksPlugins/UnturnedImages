@@ -32,7 +32,7 @@ namespace UnturnedImages.Module
             DontDestroyOnLoad(GameObject);
 
             _harmonyPatches.Patch();
-            CustomIconTool.Load();
+            CustomImageTool.Load();
             CustomVehicleTool.Load();
             _uiManager.Load();
         }
@@ -45,7 +45,7 @@ namespace UnturnedImages.Module
 
             _uiManager.Unload();
             CustomVehicleTool.Unload();
-            CustomIconTool.Unload();
+            CustomImageTool.Unload();
             _harmonyPatches.Unpatch();
 
             Instance = null;

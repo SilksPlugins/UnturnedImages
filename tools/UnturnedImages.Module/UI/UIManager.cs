@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnturnedImages.Module.Images;
 
 namespace UnturnedImages.Module.UI
 {
@@ -88,20 +89,29 @@ namespace UnturnedImages.Module.UI
                     unturnedImagesVehiclesLabel.fontAlignment = TextAnchor.MiddleCenter;
                 });
 
-                // Button - Export All Vehicle Icons
+                // Button - Export All Vehicle Images
 
                 AddElement(Glazier.Get().CreateButton, captureAllVehicleIconsButton =>
                 {
                     captureAllVehicleIconsButton.positionOffset_Y = 200;
-                    captureAllVehicleIconsButton.text = "Export All Vehicle Icons";
-                    captureAllVehicleIconsButton.onClickedButton += OnClickedCaptureAllVehicleIconsButton;
+                    captureAllVehicleIconsButton.text = "Export All Vehicle Images";
+                    captureAllVehicleIconsButton.onClickedButton += OnClickedCaptureAllVehicleImagesButton;
+                });
+
+                // Button - Export All Item Images
+
+                AddElement(Glazier.Get().CreateButton, captureAllVehicleIconsButton =>
+                {
+                    captureAllVehicleIconsButton.positionOffset_Y = 225;
+                    captureAllVehicleIconsButton.text = "Export All Item Images";
+                    captureAllVehicleIconsButton.onClickedButton += OnClickedCaptureAllItemImagesButton;
                 });
 
                 // Button - Reload Module
 
                 AddElement(Glazier.Get().CreateButton, reloadModuleButton =>
                 {
-                    reloadModuleButton.positionOffset_Y = 225;
+                    reloadModuleButton.positionOffset_Y = 250;
                     reloadModuleButton.text = "Reload Module";
                     reloadModuleButton.onClickedButton += OnClickedReloadModule;
                 });
@@ -134,10 +144,16 @@ namespace UnturnedImages.Module.UI
             return MenuUI.window != null;
         }
 
-        private void OnClickedCaptureAllVehicleIconsButton(ISleekElement button)
+        private void OnClickedCaptureAllVehicleImagesButton(ISleekElement button)
         {
             IconUtils.CreateExtrasDirectory();
-            VehicleIconUtils.CaptureAllVehicleIcons();
+            ImageUtils.CaptureAllVehicleImages();
+        }
+
+        private void OnClickedCaptureAllItemImagesButton(ISleekElement button)
+        {
+            IconUtils.CreateExtrasDirectory();
+            ImageUtils.CaptureAllItemImages();
         }
 
         private void OnClickedReloadModule(ISleekElement button)

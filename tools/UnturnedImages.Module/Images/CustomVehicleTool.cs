@@ -110,12 +110,12 @@ namespace UnturnedImages.Module.Images
             vehicle.Rotate(10, 135, -10);
             cameraTransform.rotation = Quaternion.identity;
 
-            var orthographicSize = CustomIconTool.CalculateOrthographicSize(vehicleAsset, vehicleParent.gameObject,
+            var orthographicSize = CustomImageTool.CalculateOrthographicSize(vehicleAsset, vehicleParent.gameObject,
                 cameraTransform, vehicleIconInfo.Width, vehicleIconInfo.Height, out var cameraPosition);
 
             cameraTransform.position = cameraPosition;
 
-            Texture2D texture = CustomIconTool.CaptureIcon(vehicleAsset.id, 0, vehicle, cameraTransform,
+            Texture2D texture = CustomImageTool.CaptureIcon(vehicleAsset.id, 0, vehicle, cameraTransform,
                 vehicleIconInfo.Width, vehicleIconInfo.Height, orthographicSize, true);
             
             var fileName = $"{vehicleAsset.id}.png";

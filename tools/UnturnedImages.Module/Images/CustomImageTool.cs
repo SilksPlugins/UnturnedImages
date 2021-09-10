@@ -6,9 +6,9 @@ using UnityEngine.Rendering;
 
 namespace UnturnedImages.Module.Images
 {
-    public class CustomIconTool : MonoBehaviour
+    public class CustomImageTool : MonoBehaviour
     {
-        private static CustomIconTool? _tool;
+        private static CustomImageTool? _tool;
 
         private Camera? _cameraComponent;
         private Light? _lightComponent;
@@ -17,7 +17,7 @@ namespace UnturnedImages.Module.Images
 
 		public static void Load()
 		{
-            _tool = UnturnedImagesModule.Instance!.GameObject!.AddComponent<CustomIconTool>();
+            _tool = UnturnedImagesModule.Instance!.GameObject!.AddComponent<CustomImageTool>();
 		}
 
 		public static void Unload()
@@ -41,7 +41,7 @@ namespace UnturnedImages.Module.Images
 		{
 			if (_tool == null)
             {
-                throw new Exception("No instance of CustomIconTool");
+                throw new Exception("No instance of CustomImageTool");
 			}
 
 			if (_tool._cameraComponent == null)
@@ -111,7 +111,7 @@ namespace UnturnedImages.Module.Images
 		{
             if (_tool == null)
             {
-                throw new Exception("No instance of CustomIconTool");
+                throw new Exception("No instance of CustomImageTool");
             }
 
             return _tool.CalculateOrthographicSizeInternal(assetContext, modelGameObject, cameraTransform, renderWidth,
