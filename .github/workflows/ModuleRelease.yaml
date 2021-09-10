@@ -38,7 +38,6 @@ jobs:
         mkdir UnturnedImages
         mv *.dll UnturnedImages
         mv *.module UnturnedImages
-        cd ../../../../OpenMod
         zip -qr ./Release.zip UnturnedImages
       shell: bash
 
