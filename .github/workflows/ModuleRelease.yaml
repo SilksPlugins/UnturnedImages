@@ -60,5 +60,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./Release.zip
-        asset_name: "UnturnedImages.Module-v${{ github.event.inputs.version }}.zip"
+        asset_name: "UnturnedImages.Module.zip"
         asset_content_type: application/zip
