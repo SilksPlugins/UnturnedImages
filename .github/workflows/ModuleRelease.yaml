@@ -32,13 +32,14 @@ jobs:
     - name: Build
       run: dotnet build ./tools/UnturnedImages.Module/UnturnedImages.Module.csproj --configuration Release --no-restore
       
-    - name: Zip OpenMod release artifacts
+    - name: Zip release
       run: |
         cd "./tools/UnturnedImages.Module/bin/Release/net461"
         mkdir UnturnedImages
         mv *.dll UnturnedImages
         mv *.module UnturnedImages
-        zip -qr ./Release.zip UnturnedImages
+        zip -qr ../../../../../Release.zip UnturnedImages/
+        cd ../../../../../
       shell: bash
 
     - name: Create release
@@ -52,7 +53,7 @@ jobs:
         draft: true
         prerelease: false
         
-    - name: Upload OpenMod release asset
+    - name: Upload release asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
