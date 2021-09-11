@@ -1,29 +1,36 @@
 ﻿using SDG.Unturned;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace UnturnedImages.Module.Images
 {
     public static class ImageUtils
     {
-        public static void CaptureAllVehicleImages()
+        public static void CaptureVehicleImages(string outputSubpath, IEnumerable<VehicleAsset> vehicleAssets)
         {
-            var vehicleAssets = Assets.find(EAssetType.VEHICLE).OfType<VehicleAsset>().ToList();
-
             foreach (var vehicleAsset in vehicleAssets)
             {
-                CustomVehicleTool.QueueVehicleIcon(vehicleAsset, 1024, 1024);
+                var outputPath =
+                    $"{ReadWrite.PATH}/Extras/{outputSubpath}/{vehicleAsset.originMasterBundle?.assetBundleNameWithoutExtension ?? "unknown"}/{vehicleAsset.id}";
+
+                CustomVehicleTool.QueueVehicleIcon(vehicleAsset, outputPath, 1024, 1024);
             }
         }
 
-        public static void CaptureAllItemImages()
+        public static void CaptureAllVehicleImages()
         {
-            var itemAssets = Assets.find(EAssetType.ITEM).OfType<ItemAsset>().ToList();
+            var vehicleAssets = Assets.find(EAssetType.VEHICLE).OfType<VehicleAsset>();
 
+            CaptureVehicleImages("Vehicles", vehicleAssets);
+        }
+
+        public static void CaptureItemImages(string outputSubpath, IEnumerable<ItemAsset> itemAssets)
+        {
             foreach (var itemAsset in itemAssets)
             {
                 var extraItemIconInfo = new ExtraItemIconInfo
                 {
-                    extraPath = $"{ReadWrite.PATH}/Extras/Items/{itemAsset.id}"
+                    extraPath = $"{ReadWrite.PATH}/Extras/{outputSubpath}/{itemAsset.originMasterBundle?.assetBundleNameWithoutExtension ?? "unknown"}/{itemAsset.id}"
                 };
 
                 ItemTool.getIcon(itemAsset.id, 0, 100, itemAsset.getState(), itemAsset, null, string.Empty,
@@ -32,6 +39,13 @@ namespace UnturnedImages.Module.Images
 
                 IconUtils.extraIcons.Add(extraItemIconInfo);
             }
+        }
+
+        public static void CaptureAllItemImages()
+        {
+            var itemAssets = Assets.find(EAssetType.ITEM).OfType<ItemAsset>().ToList();
+
+            CaptureItemImages("Items", itemAssets);
         }
     }
 }
