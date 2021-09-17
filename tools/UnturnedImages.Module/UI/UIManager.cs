@@ -23,6 +23,10 @@ namespace UnturnedImages.Module.UI
 
         private readonly List<ISleekElement> _loadedElements;
 
+        private ISleekFloat32Field? _vehicleAnglesXInput;
+        private ISleekFloat32Field? _vehicleAnglesYInput;
+        private ISleekFloat32Field? _vehicleAnglesZInput;
+
         public UIManager()
         {
             _loadedElements = new List<ISleekElement>();
@@ -68,6 +72,8 @@ namespace UnturnedImages.Module.UI
             }
             else
             {
+                var positionOffsetY = 175;
+
                 void AddElement<TElement>(Func<TElement> constructor, Action<TElement> modifiers)
                     where TElement : ISleekElement
                 {
@@ -75,6 +81,9 @@ namespace UnturnedImages.Module.UI
 
                     element.sizeOffset_X = 200;
                     element.sizeOffset_Y = 25;
+
+                    element.positionOffset_Y = positionOffsetY;
+                    positionOffsetY += 25;
 
                     modifiers(element);
 
@@ -86,7 +95,6 @@ namespace UnturnedImages.Module.UI
 
                 AddElement(Glazier.Get().CreateLabel, unturnedImagesVehiclesLabel =>
                 {
-                    unturnedImagesVehiclesLabel.positionOffset_Y = 175;
                     unturnedImagesVehiclesLabel.text = "UnturnedImages Controls";
                     unturnedImagesVehiclesLabel.fontAlignment = TextAnchor.MiddleCenter;
                 });
@@ -95,7 +103,6 @@ namespace UnturnedImages.Module.UI
 
                 AddElement(Glazier.Get().CreateButton, captureAllVehicleIconsButton =>
                 {
-                    captureAllVehicleIconsButton.positionOffset_Y = 200;
                     captureAllVehicleIconsButton.text = "Export All Vehicle Images";
                     captureAllVehicleIconsButton.onClickedButton += OnClickedCaptureAllVehicleImagesButton;
                 });
@@ -104,27 +111,70 @@ namespace UnturnedImages.Module.UI
 
                 AddElement(Glazier.Get().CreateButton, captureAllVehicleIconsButton =>
                 {
-                    captureAllVehicleIconsButton.positionOffset_Y = 225;
                     captureAllVehicleIconsButton.text = "Export All Item Images";
                     captureAllVehicleIconsButton.onClickedButton += OnClickedCaptureAllItemImagesButton;
                 });
 
-                // Button - Reload Module
+                // Button - Open Extras Folder
 
-                AddElement(Glazier.Get().CreateButton, reloadModuleButton =>
+                AddElement(Glazier.Get().CreateButton, extrasFolderButton =>
                 {
-                    reloadModuleButton.positionOffset_Y = 250;
-                    reloadModuleButton.text = "Open Extras Folder";
-                    reloadModuleButton.onClickedButton += OnClickedOpenExtrasFolder;
+                    extrasFolderButton.text = "Open Extras Folder";
+                    extrasFolderButton.onClickedButton += OnClickedOpenExtrasFolder;
                 });
 
                 // Button - Reload Module
 
+                positionOffsetY += 25;
+
                 AddElement(Glazier.Get().CreateButton, reloadModuleButton =>
                 {
-                    reloadModuleButton.positionOffset_Y = 300;
                     reloadModuleButton.text = "Reload Module";
                     reloadModuleButton.onClickedButton += OnClickedReloadModule;
+                });
+
+                // Label - Advanced Settings
+
+                positionOffsetY += 25;
+
+                AddElement(Glazier.Get().CreateLabel, advancedSettingsLabel =>
+                {
+                    advancedSettingsLabel.text = "Advanced Settings";
+                });
+
+                // Label - Vehicle Icon Angles
+
+                positionOffsetY += 25;
+
+                AddElement(Glazier.Get().CreateLabel, vehicleIconAnglesLabel =>
+                {
+                    vehicleIconAnglesLabel.text = "Vehicle Icon Angles";
+                });
+
+                // Vehicle Icon Angles
+
+                AddElement(Glazier.Get().CreateFloat32Field, vehicleAnglesXInput =>
+                {
+                    vehicleAnglesXInput.addLabel("X", ESleekSide.RIGHT);
+                    vehicleAnglesXInput.state = 10;
+
+                    _vehicleAnglesXInput = vehicleAnglesXInput;
+                });
+
+                AddElement(Glazier.Get().CreateFloat32Field, vehicleAnglesYInput =>
+                {
+                    vehicleAnglesYInput.addLabel("Y", ESleekSide.RIGHT);
+                    vehicleAnglesYInput.state = 135;
+
+                    _vehicleAnglesYInput = vehicleAnglesYInput;
+                });
+
+                AddElement(Glazier.Get().CreateFloat32Field, vehicleAnglesZInput =>
+                {
+                    vehicleAnglesZInput.addLabel("Z", ESleekSide.RIGHT);
+                    vehicleAnglesZInput.state = -10;
+
+                    _vehicleAnglesZInput = vehicleAnglesZInput;
                 });
 
                 // Make workshop tools visible by default
@@ -148,6 +198,10 @@ namespace UnturnedImages.Module.UI
                     _iconToolsContainer.RemoveChild(element);
                 }
             }
+
+            _vehicleAnglesXInput = null;
+            _vehicleAnglesYInput = null;
+            _vehicleAnglesZInput = null;
         }
 
         private bool IsUnturnedUILoaded()
@@ -157,8 +211,13 @@ namespace UnturnedImages.Module.UI
 
         private void OnClickedCaptureAllVehicleImagesButton(ISleekElement button)
         {
+            var vehicleAngles = new Vector3(
+                _vehicleAnglesXInput?.state ?? 0,
+                _vehicleAnglesYInput?.state ?? 0,
+                _vehicleAnglesZInput?.state ?? 0);
+            
             IconUtils.CreateExtrasDirectory();
-            ImageUtils.CaptureAllVehicleImages();
+            ImageUtils.CaptureAllVehicleImages(vehicleAngles);
         }
 
         private void OnClickedCaptureAllItemImagesButton(ISleekElement button)

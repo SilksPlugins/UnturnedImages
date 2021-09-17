@@ -17,12 +17,16 @@ namespace UnturnedImages.Module.Images
 
 			public int Height { get; }
 
-            public CustomVehicleIconInfo(VehicleAsset vehicleAsset, string outputPath, int width, int height)
+            public Vector3 Angles { get; }
+
+            public CustomVehicleIconInfo(VehicleAsset vehicleAsset, string outputPath, int width, int height,
+                Vector3 angles)
             {
                 VehicleAsset = vehicleAsset;
                 OutputPath = outputPath;
                 Width = width;
                 Height = height;
+                Angles = angles;
             }
         }
 
@@ -41,8 +45,7 @@ namespace UnturnedImages.Module.Images
 
             _instance = null;
         }
-
-
+        
         public static Transform? GetVehicle(VehicleAsset vehicleAsset)
 		{
 			var gameObject = vehicleAsset.model?.getOrLoad();
@@ -59,10 +62,13 @@ namespace UnturnedImages.Module.Images
             return transform;
 
         }
-		
-		public static void QueueVehicleIcon(VehicleAsset vehicleAsset, string outputPath, int width, int height)
-		{
-			var vehicleIconInfo = new CustomVehicleIconInfo(vehicleAsset, outputPath, width, height);
+
+        public static void QueueVehicleIcon(VehicleAsset vehicleAsset, string outputPath, int width, int height,
+            Vector3? vehicleAngles = null)
+        {
+            vehicleAngles ??= Vector3.zero;
+
+            var vehicleIconInfo = new CustomVehicleIconInfo(vehicleAsset, outputPath, width, height, vehicleAngles.Value);
 
 			Icons.Enqueue(vehicleIconInfo);
 		}
@@ -109,7 +115,7 @@ namespace UnturnedImages.Module.Images
 
             cameraTransform.SetParent(vehicle, false);
 
-            vehicle.Rotate(10, 135, -10);
+            vehicle.Rotate(vehicleIconInfo.Angles);
             cameraTransform.rotation = Quaternion.identity;
 
             var orthographicSize = CustomImageTool.CalculateOrthographicSize(vehicleAsset, vehicleParent.gameObject,
