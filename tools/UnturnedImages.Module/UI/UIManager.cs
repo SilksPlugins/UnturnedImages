@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnturnedImages.Module.Images;
+using UnturnedImages.Module.Workshop;
 
 namespace UnturnedImages.Module.UI
 {
@@ -115,6 +116,28 @@ namespace UnturnedImages.Module.UI
                     captureAllVehicleIconsButton.onClickedButton += OnClickedCaptureAllItemImagesButton;
                 });
 
+                positionOffsetY += 25;
+
+                // Label - Export Certain Mods
+
+                AddElement(Glazier.Get().CreateLabel, exportCertainModsLabel =>
+                {
+                    exportCertainModsLabel.text = "Export Certain Mods";
+                });
+
+                // Buttons - Export Certain Mod
+
+                foreach (var mod in WorkshopHelper.GetAllMods())
+                {
+                    AddElement(Glazier.Get().CreateButton, exportCertainModButton =>
+                    {
+                        exportCertainModButton.text = mod == 0 ? "Vanilla" : $"Mod {mod}";
+                        exportCertainModButton.onClickedButton += x => OnExportModClicked(x, mod);
+                    });
+                }
+
+                positionOffsetY += 25;
+
                 // Button - Open Extras Folder
 
                 AddElement(Glazier.Get().CreateButton, extrasFolderButton =>
@@ -180,6 +203,18 @@ namespace UnturnedImages.Module.UI
                 // Make workshop tools visible by default
                 _iconToolsContainer.isVisible = true;
             }
+        }
+
+        private void OnExportModClicked(ISleekElement button, uint modId)
+        {
+            var vehicleAngles = new Vector3(
+                _vehicleAnglesXInput?.state ?? 0,
+                _vehicleAnglesYInput?.state ?? 0,
+                _vehicleAnglesZInput?.state ?? 0);
+
+            IconUtils.CreateExtrasDirectory();
+            ImageUtils.CaptureModItemImages(modId);
+            ImageUtils.CaptureModVehicleImages(modId, vehicleAngles);
         }
 
         private void DetachUI()

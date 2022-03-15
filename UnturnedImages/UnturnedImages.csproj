@@ -9,7 +9,7 @@
 		<PackageDescription>An OpenMod plugin for Unturned which adds a repository of images available to plugins for usage in UIs.</PackageDescription>
 		<PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
 		<PackageAuthor>Stephen White</PackageAuthor>
-		<PackageTags>openmod openmod-plugin universal shops</PackageTags>
+		<PackageTags>openmod openmod-plugin unturned</PackageTags>
 		<Version>0.0.0</Version>
 		<RepositoryUrl>https://github.com/SilKsPlugins/UnturnedImages</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>

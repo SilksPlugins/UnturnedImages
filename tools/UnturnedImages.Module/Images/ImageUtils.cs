@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnturnedImages.Module.Workshop;
 
 namespace UnturnedImages.Module.Images
 {
     public static class ImageUtils
     {
-        public static void CaptureVehicleImages(string outputSubpath, IEnumerable<VehicleAsset> vehicleAssets,
+        public static void CaptureVehicleImages(IEnumerable<VehicleAsset> vehicleAssets,
             Vector3? vehicleAngles = null)
         {
+            const string outputSubpath = "Vehicles";
+
             foreach (var vehicleAsset in vehicleAssets)
             {
                 var outputPath =
@@ -23,16 +26,26 @@ namespace UnturnedImages.Module.Images
         {
             var vehicleAssets = Assets.find(EAssetType.VEHICLE).OfType<VehicleAsset>();
 
-            CaptureVehicleImages("Vehicles", vehicleAssets, vehicleAngles);
+            CaptureVehicleImages(vehicleAssets, vehicleAngles);
         }
 
-        public static void CaptureItemImages(string outputSubpath, IEnumerable<ItemAsset> itemAssets)
+        public static void CaptureItemImages(IEnumerable<ItemAsset> itemAssets)
         {
+            const string outputSubpath = "Items";
+
+            var basePath = $"{ReadWrite.PATH}/Extras/{outputSubpath}";
+
             foreach (var itemAsset in itemAssets)
             {
+                var path = WorkshopHelper.IsWorkshop(itemAsset)
+                    ? $"Workshop/{WorkshopHelper.GetWorkshopId(itemAsset)}"
+                    : "Official";
+
+                path = $"{basePath}/{path}/{itemAsset.id}";
+
                 var extraItemIconInfo = new ExtraItemIconInfo
                 {
-                    extraPath = $"{ReadWrite.PATH}/Extras/{outputSubpath}/{itemAsset.originMasterBundle?.assetBundleNameWithoutExtension ?? "unknown"}/{itemAsset.id}"
+                    extraPath = path
                 };
 
                 ItemTool.getIcon(itemAsset.id, 0, 100, itemAsset.getState(), itemAsset, null, string.Empty,
@@ -42,7 +55,6 @@ namespace UnturnedImages.Module.Images
                         extraItemIconInfo.onItemIconReady(texture);
 
                         UnturnedLog.info(extraItemIconInfo.extraPath);
-                        UnturnedLog.info(itemAsset.originMasterBundle?.assetBundleName);
                     });
 
                 IconUtils.extraIcons.Add(extraItemIconInfo);
@@ -53,7 +65,23 @@ namespace UnturnedImages.Module.Images
         {
             var itemAssets = Assets.find(EAssetType.ITEM).OfType<ItemAsset>().ToList();
 
-            CaptureItemImages("Items", itemAssets);
+            CaptureItemImages(itemAssets);
+        }
+
+        public static void CaptureModItemImages(uint mod)
+        {
+            var itemAssets = Assets.find(EAssetType.ITEM).OfType<ItemAsset>()
+                .Where(x => WorkshopHelper.GetWorkshopIdSafe(x) == mod);
+
+            CaptureItemImages(itemAssets);
+        }
+
+        public static void CaptureModVehicleImages(uint mod, Vector3? vehicleAngles = null)
+        {
+            var vehicleAssets = Assets.find(EAssetType.VEHICLE).OfType<VehicleAsset>()
+                .Where(x => WorkshopHelper.GetWorkshopIdSafe(x) == mod);
+
+            CaptureVehicleImages(vehicleAssets, vehicleAngles);
         }
     }
 }
