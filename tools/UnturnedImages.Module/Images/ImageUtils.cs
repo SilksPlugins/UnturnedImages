@@ -13,12 +13,17 @@ namespace UnturnedImages.Module.Images
         {
             const string outputSubpath = "Vehicles";
 
+            var basePath = $"{ReadWrite.PATH}/Extras/{outputSubpath}";
+
             foreach (var vehicleAsset in vehicleAssets)
             {
-                var outputPath =
-                    $"{ReadWrite.PATH}/Extras/{outputSubpath}/{vehicleAsset.originMasterBundle?.assetBundleNameWithoutExtension ?? "unknown"}/{vehicleAsset.id}";
+                var path = WorkshopHelper.IsWorkshop(vehicleAsset)
+                    ? $"Workshop/{WorkshopHelper.GetWorkshopId(vehicleAsset)}"
+                    : "Official";
 
-                CustomVehicleTool.QueueVehicleIcon(vehicleAsset, outputPath, 1024, 1024, vehicleAngles);
+                path = $"{basePath}/{path}/{vehicleAsset.id}";
+
+                CustomVehicleTool.QueueVehicleIcon(vehicleAsset, path, 1024, 1024, vehicleAngles);
             }
         }
 
