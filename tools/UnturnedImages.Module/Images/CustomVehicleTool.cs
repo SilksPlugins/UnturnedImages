@@ -1,21 +1,21 @@
 ﻿using SDG.Unturned;
+using Steamworks;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace UnturnedImages.Module.Images
 {
     public class CustomVehicleTool : MonoBehaviour
-	{
+    {
         public class CustomVehicleIconInfo
         {
-			public VehicleAsset VehicleAsset { get; }
+            public VehicleAsset VehicleAsset { get; }
 
             public string OutputPath { get; }
 
-			public int Width { get; }
+            public int Width { get; }
 
-			public int Height { get; }
+            public int Height { get; }
 
             public Vector3 Angles { get; }
 
@@ -31,8 +31,13 @@ namespace UnturnedImages.Module.Images
         }
 
         private static CustomVehicleTool? _instance;
+        private static readonly string[] _weirdLookingObjects = new[]
+        {
+            "DepthMask"
+        };
 
-        private static readonly Queue<CustomVehicleIconInfo> Icons = new();
+        private readonly Queue<CustomVehicleIconInfo> Icons = new();
+        private Transform _camera = null!;
 
         public static void Load()
         {
@@ -45,42 +50,48 @@ namespace UnturnedImages.Module.Images
 
             _instance = null;
         }
-        
+
+        private void Start()
+        {
+            var camera = new GameObject();
+            _camera = camera.transform;
+        }
+
         public static Transform? GetVehicle(VehicleAsset vehicleAsset)
-		{
-			var gameObject = vehicleAsset.model?.getOrLoad();
+        {
+            var gameObject = vehicleAsset.model?.getOrLoad();
 
             if (gameObject == null)
             {
                 return null;
-			}
+            }
 
-            var transform = Instantiate(gameObject).transform;
-
-            transform.name = vehicleAsset.id.ToString();
-
-            return transform;
-
+            return Instantiate(gameObject).transform;
         }
 
         public static void QueueVehicleIcon(VehicleAsset vehicleAsset, string outputPath, int width, int height,
             Vector3? vehicleAngles = null)
         {
+            if (_instance == null)
+            {
+                return;
+            }
+
             vehicleAngles ??= Vector3.zero;
 
             var vehicleIconInfo = new CustomVehicleIconInfo(vehicleAsset, outputPath, width, height, vehicleAngles.Value);
 
-			Icons.Enqueue(vehicleIconInfo);
-		}
-		
-		private void Update()
-		{
-			if (Icons.Count == 0)
-			{
-				return;
-			}
+            _instance.Icons.Enqueue(vehicleIconInfo);
+        }
 
-			var vehicleIconInfo = Icons.Dequeue();
+        private void Update()
+        {
+            if (Icons.Count == 0)
+            {
+                return;
+            }
+
+            var vehicleIconInfo = Icons.Dequeue();
 
             var vehicleAsset = vehicleIconInfo.VehicleAsset;
             var vehicle = GetVehicle(vehicleAsset);
@@ -93,16 +104,46 @@ namespace UnturnedImages.Module.Images
 
             Layerer.relayer(vehicle, LayerMasks.VEHICLE);
 
-            var weirdLookingObjects = new[]
+            foreach (var weirdLookingObject in _weirdLookingObjects)
             {
-                "DepthMask"
-            };
-
-            foreach (Transform child in vehicle)
-            {
-                if (weirdLookingObjects.Contains(child.name))
+                var child = vehicle.Find(weirdLookingObject);
+                if (child != null)
                 {
                     child.gameObject.SetActive(false);
+                }
+            }
+
+            // fix rotors
+            var rotors = vehicle.Find("Rotors");
+            if (rotors != null)
+            {
+                for (var i = 0; i < rotors.childCount; i++)
+                {
+                    var rotor = rotors.GetChild(i);
+
+                    var material0 = rotor.Find("Model_0").GetComponent<Renderer>().material;
+                    var material1 = rotor.Find("Model_1").GetComponent<Renderer>().material;
+
+                    if (vehicleAsset.requiredShaderUpgrade)
+                    {
+                        if (StandardShaderUtils.isMaterialUsingStandardShader(material0))
+                        {
+                            StandardShaderUtils.setModeToTransparent(material0);
+                        }
+                        if (StandardShaderUtils.isMaterialUsingStandardShader(material1))
+                        {
+                            StandardShaderUtils.setModeToTransparent(material1);
+                        }
+                    }
+
+                    var color = material0.color;
+                    color.a = 1f;
+                    material0.color = color;
+
+                    color.a = 0f;
+                    material1.color = color;
+
+                    rotor.localRotation = Quaternion.identity;
                 }
             }
 
@@ -111,29 +152,27 @@ namespace UnturnedImages.Module.Images
 
             vehicleParent.position = new Vector3(-256f, -256f, 0f);
 
-            var cameraTransform = new GameObject().transform;
-
-            cameraTransform.SetParent(vehicle, false);
+            _camera.SetParent(vehicle, false);
 
             vehicle.Rotate(vehicleIconInfo.Angles);
-            cameraTransform.rotation = Quaternion.identity;
+            _camera.rotation = Quaternion.identity;
 
             var orthographicSize = CustomImageTool.CalculateOrthographicSize(vehicleAsset, vehicleParent.gameObject,
-                cameraTransform, vehicleIconInfo.Width, vehicleIconInfo.Height, out var cameraPosition);
+                _camera, vehicleIconInfo.Width, vehicleIconInfo.Height, out var cameraPosition);
 
-            cameraTransform.position = cameraPosition;
+            _camera.position = cameraPosition;
 
-            Texture2D texture = CustomImageTool.CaptureIcon(vehicleAsset.id, 0, vehicle, cameraTransform,
+            Texture2D texture = CustomImageTool.CaptureIcon(vehicleAsset.id, 0, vehicle, _camera,
                 vehicleIconInfo.Width, vehicleIconInfo.Height, orthographicSize, true);
-            
+
             var path = $"{vehicleIconInfo.OutputPath}.png";
 
             var bytes = texture.EncodeToPNG();
 
-            UnturnedLog.info(path);
             ReadWrite.writeBytes(path, false, false, bytes);
 
+            _camera.SetParent(null);
             Destroy(vehicleParent.gameObject);
         }
-	}
+    }
 }

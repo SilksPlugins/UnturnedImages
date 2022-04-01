@@ -57,7 +57,7 @@ namespace UnturnedImages.Module.Images
 			_tool.transform.position = icon.position;
 			_tool.transform.rotation = icon.rotation;
 
-			var antiAliasing = 4;
+            const int antiAliasing = 4;
 			var temporary = RenderTexture.GetTemporary(width, height, 16, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB, antiAliasing);
 			temporary.name = $"Render_{id}_{skin}";
 
