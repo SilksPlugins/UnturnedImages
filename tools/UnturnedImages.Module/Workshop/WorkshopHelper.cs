@@ -26,7 +26,7 @@ namespace UnturnedImages.Module.Workshop
                 throw new Exception($"Workshop ID could not be found for asset {asset.id} ({asset.assetCategory}) ({asset.absoluteOriginFilePath})");
             }
 
-            var cutStr = originFilePath.Substring(index + WorkshopPathIndicator.Length + 1);
+            var cutStr = originFilePath.Substring(index + WorkshopPathIndicator.Length);
 
             var workshopIdStr = new string(cutStr.TakeWhile(char.IsNumber).ToArray());
 
