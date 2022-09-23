@@ -111,7 +111,7 @@ namespace UnturnedImages.Items
 
             var repository = @override?.Repository ?? _defaultItemRepository;
 
-            return repository == null ? null : Smart.Format(repository, new {ItemId = id});
+            return repository == null ? null : Smart.Format(repository, new { ItemId = id });
         }
 
 
