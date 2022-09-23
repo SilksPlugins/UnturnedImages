@@ -48,7 +48,7 @@ namespace UnturnedImages.Module.Images
         
         public static Transform? GetVehicle(VehicleAsset vehicleAsset)
 		{
-			var gameObject = vehicleAsset.model?.getOrLoad();
+			var gameObject = vehicleAsset.GetOrLoadModel();
 
             if (gameObject == null)
             {
