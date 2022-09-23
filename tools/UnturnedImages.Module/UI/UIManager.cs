@@ -250,7 +250,7 @@ namespace UnturnedImages.Module.UI
                 _vehicleAnglesXInput?.state ?? 0,
                 _vehicleAnglesYInput?.state ?? 0,
                 _vehicleAnglesZInput?.state ?? 0);
-            
+
             IconUtils.CreateExtrasDirectory();
             ImageUtils.CaptureAllVehicleImages(vehicleAngles);
         }

@@ -78,7 +78,7 @@ namespace UnturnedImages.Module.Bootstrapper
             Assemblies.Add(realFullname, assembly);
             return assembly;
         }
-        
+
         public static Assembly? GetAssembly(string fullname)
         {
             if (Assemblies.TryGetValue(fullname, out var assembly))

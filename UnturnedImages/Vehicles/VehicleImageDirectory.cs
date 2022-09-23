@@ -111,7 +111,7 @@ namespace UnturnedImages.Vehicles
 
             var repository = @override?.Repository ?? _defaultVehicleRepository;
 
-            return repository == null ? null : Smart.Format(repository, new {VehicleId = id});
+            return repository == null ? null : Smart.Format(repository, new { VehicleId = id });
         }
 
 
