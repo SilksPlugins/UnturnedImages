@@ -53,7 +53,7 @@ namespace UnturnedImages.Module.Images
         private void Start()
         {
             var camera = new GameObject();
-            _camera = camera.transform;
+            _camera = Instantiate(camera).transform;
         }
 
         public static Transform? GetVehicle(VehicleAsset vehicleAsset)
@@ -91,10 +91,8 @@ namespace UnturnedImages.Module.Images
             }
 
             var vehicleIconInfo = Icons.Dequeue();
-
             var vehicleAsset = vehicleIconInfo.VehicleAsset;
             var vehicle = GetVehicle(vehicleAsset);
-
             if (vehicle == null)
             {
                 UnturnedLog.error($"Could not get model for vehicle with ID {vehicleAsset.id}");
@@ -102,7 +100,6 @@ namespace UnturnedImages.Module.Images
             }
 
             Layerer.relayer(vehicle, LayerMasks.VEHICLE);
-
             foreach (var weirdLookingObject in _weirdLookingObjects)
             {
                 var child = vehicle.Find(weirdLookingObject);
@@ -150,6 +147,9 @@ namespace UnturnedImages.Module.Images
             vehicle.SetParent(vehicleParent);
 
             vehicleParent.position = new Vector3(-256f, -256f, 0f);
+
+            if (_camera == null)
+                _camera = Instantiate(new GameObject()).transform;
 
             _camera.SetParent(vehicle, false);
 
