@@ -1,4 +1,6 @@
-﻿using SDG.Unturned;
+﻿using HarmonyLib;
+using JetBrains.Annotations;
+using SDG.Unturned;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +13,8 @@ namespace UnturnedImages.Module.Images
 {
     public static class ImageUtils
     {
+        internal static Vector3 ItemIconRotation { get; private set; }
+
         private static string GenerateIdRanges(List<ushort> ids)
         {
             ids.Sort();
@@ -159,9 +163,12 @@ namespace UnturnedImages.Module.Images
             });
         }
 
-        public static void CaptureItemImages(IEnumerable<ItemAsset> itemAssets)
+        public static void CaptureItemImages(IEnumerable<ItemAsset> itemAssets, Vector3? itemIconRotation = null)
         {
             const string category = "Items";
+            
+            // Update item icon rotation
+            ItemIconRotation = itemIconRotation ?? Vector3.zero;
 
             CaptureImages(itemAssets, category, (asset, path) =>
             {
@@ -188,19 +195,19 @@ namespace UnturnedImages.Module.Images
             CaptureVehicleImages(vehicleAssets, vehicleAngles);
         }
 
-        public static void CaptureAllItemImages()
+        public static void CaptureAllItemImages(Vector3? itemAngles = null)
         {
             var itemAssets = Assets.find(EAssetType.ITEM).OfType<ItemAsset>().ToList();
 
-            CaptureItemImages(itemAssets);
+            CaptureItemImages(itemAssets, itemAngles);
         }
 
-        public static void CaptureModItemImages(uint mod)
+        public static void CaptureModItemImages(uint mod, Vector3? itemAngles = null)
         {
             var itemAssets = Assets.find(EAssetType.ITEM).OfType<ItemAsset>()
                 .Where(x => WorkshopHelper.GetWorkshopIdSafe(x) == mod);
 
-            CaptureItemImages(itemAssets);
+            CaptureItemImages(itemAssets, itemAngles);
         }
 
         public static void CaptureModVehicleImages(uint mod, Vector3? vehicleAngles = null)
@@ -209,6 +216,50 @@ namespace UnturnedImages.Module.Images
                 .Where(x => WorkshopHelper.GetWorkshopIdSafe(x) == mod);
 
             CaptureVehicleImages(vehicleAssets, vehicleAngles);
+        }
+
+        [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
+        [HarmonyPatch]
+        private static class UnturnedPatches
+        {
+            private static Vector3 _iconPosition;
+            private static Quaternion _iconRotation;
+
+            [HarmonyPatch(typeof(ItemTool), "captureIcon")]
+            [HarmonyPrefix]
+            public static void ItemToolCaptureIconPre(Transform model, Transform icon, ushort id, int width, int height, ref float orthoSize)
+            {
+                // Preserve position and rotation
+                _iconPosition = icon.position;
+                _iconRotation = icon.rotation;
+
+                var up = icon.up;
+                var forward = icon.forward;
+                var right = icon.right;
+
+                // Adjust item icon rotation
+                icon.RotateAround(model.position, right, ItemIconRotation.x);
+                icon.RotateAround(model.position, up, ItemIconRotation.y);
+                icon.RotateAround(model.position, forward, ItemIconRotation.z);
+
+
+                // Fix ortho size
+                var itemAsset = Assets.find(EAssetType.ITEM, id);
+
+                orthoSize = CustomImageTool.CalculateOrthographicSize(itemAsset, model.gameObject, icon, width, height, out var position);
+
+                // Adjust item icon position
+                icon.position = position;
+            }
+
+            [HarmonyPatch(typeof(ItemTool), "captureIcon")]
+            [HarmonyPostfix]
+            public static void ItemToolCaptureIconPost(Transform icon)
+            {
+                // Restore position and rotation
+                icon.position = _iconPosition;
+                icon.rotation = _iconRotation;
+            }
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using SDG.Unturned;
+﻿using HarmonyLib;
+using JetBrains.Annotations;
+using SDG.Unturned;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -106,7 +108,7 @@ namespace UnturnedImages.Module.Images
             return texture2D;
         }
 
-        public static float CalculateOrthographicSize(VehicleAsset assetContext, GameObject modelGameObject,
+        public static float CalculateOrthographicSize(Asset assetContext, GameObject modelGameObject,
             Transform cameraTransform, int renderWidth, int renderHeight, out Vector3 cameraPosition)
         {
             if (_tool == null)
@@ -119,7 +121,7 @@ namespace UnturnedImages.Module.Images
         }
 
         // From SDG.Unturned.ItemTool
-        private float CalculateOrthographicSizeInternal(VehicleAsset assetContext, GameObject modelGameObject,
+        private float CalculateOrthographicSizeInternal(Asset assetContext, GameObject modelGameObject,
             Transform cameraTransform, int renderWidth, int renderHeight, out Vector3 cameraPosition)
         {
             cameraPosition = cameraTransform.position;

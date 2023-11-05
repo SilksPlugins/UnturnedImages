@@ -28,6 +28,10 @@ namespace UnturnedImages.Module.UI
         private ISleekFloat32Field? _vehicleAnglesYInput;
         private ISleekFloat32Field? _vehicleAnglesZInput;
 
+        private ISleekFloat32Field? _itemAnglesXInput;
+        private ISleekFloat32Field? _itemAnglesYInput;
+        private ISleekFloat32Field? _itemAnglesZInput;
+
         public UIManager()
         {
             _loadedElements = new List<ISleekElement>();
@@ -73,7 +77,7 @@ namespace UnturnedImages.Module.UI
             }
             else
             {
-                var positionOffsetY = 175;
+                var positionOffsetY = 300;
 
                 void AddElement<TElement>(Func<TElement> constructor, Action<TElement> modifiers)
                     where TElement : ISleekElement
@@ -118,26 +122,6 @@ namespace UnturnedImages.Module.UI
 
                 positionOffsetY += 25;
 
-                // Label - Export Certain Mods
-
-                AddElement(Glazier.Get().CreateLabel, exportCertainModsLabel =>
-                {
-                    exportCertainModsLabel.text = "Export Certain Mods";
-                });
-
-                // Buttons - Export Certain Mod
-
-                foreach (var mod in WorkshopHelper.GetAllMods())
-                {
-                    AddElement(Glazier.Get().CreateButton, exportCertainModButton =>
-                    {
-                        exportCertainModButton.text = mod == 0 ? "Vanilla" : $"Mod {mod}";
-                        exportCertainModButton.onClickedButton += x => OnExportModClicked(x, mod);
-                    });
-                }
-
-                positionOffsetY += 25;
-
                 // Button - Open Extras Folder
 
                 AddElement(Glazier.Get().CreateButton, extrasFolderButton =>
@@ -163,6 +147,41 @@ namespace UnturnedImages.Module.UI
                 AddElement(Glazier.Get().CreateLabel, advancedSettingsLabel =>
                 {
                     advancedSettingsLabel.text = "Advanced Settings";
+                });
+
+                // Label - Item Icon Angles
+
+                positionOffsetY += 25;
+
+                AddElement(Glazier.Get().CreateLabel, vehicleIconAnglesLabel =>
+                {
+                    vehicleIconAnglesLabel.text = "Item Icon Angles";
+                });
+
+                // Item Icon Angles
+
+                AddElement(Glazier.Get().CreateFloat32Field, itemAnglesYInput =>
+                {
+                    itemAnglesYInput.addLabel("X", ESleekSide.RIGHT);
+                    itemAnglesYInput.state = 0;
+
+                    _itemAnglesXInput = itemAnglesYInput;
+                });
+
+                AddElement(Glazier.Get().CreateFloat32Field, itemAnglesYInput =>
+                {
+                    itemAnglesYInput.addLabel("Y", ESleekSide.RIGHT);
+                    itemAnglesYInput.state = 0;
+
+                    _itemAnglesYInput = itemAnglesYInput;
+                });
+
+                AddElement(Glazier.Get().CreateFloat32Field, itemAnglesZInput =>
+                {
+                    itemAnglesZInput.addLabel("Z", ESleekSide.RIGHT);
+                    itemAnglesZInput.state = -0;
+
+                    _itemAnglesZInput = itemAnglesZInput;
                 });
 
                 // Label - Vehicle Icon Angles
@@ -200,6 +219,26 @@ namespace UnturnedImages.Module.UI
                     _vehicleAnglesZInput = vehicleAnglesZInput;
                 });
 
+                // Label - Export Certain Mods
+
+                AddElement(Glazier.Get().CreateLabel, exportCertainModsLabel =>
+                {
+                    exportCertainModsLabel.text = "Export Certain Mods";
+                });
+
+                // Buttons - Export Certain Mod
+
+                foreach (var mod in WorkshopHelper.GetAllMods())
+                {
+                    AddElement(Glazier.Get().CreateButton, exportCertainModButton =>
+                    {
+                        exportCertainModButton.text = mod == 0 ? "Vanilla" : $"Mod {mod}";
+                        exportCertainModButton.onClickedButton += x => OnExportModClicked(x, mod);
+                    });
+                }
+
+                positionOffsetY += 25;
+
                 // Make workshop tools visible by default
                 _iconToolsContainer.isVisible = true;
             }
@@ -212,8 +251,13 @@ namespace UnturnedImages.Module.UI
                 _vehicleAnglesYInput?.state ?? 0,
                 _vehicleAnglesZInput?.state ?? 0);
 
+            var itemAngles = new Vector3(
+                _itemAnglesXInput?.state ?? 0,
+                _itemAnglesYInput?.state ?? 0,
+                _itemAnglesZInput?.state ?? 0);
+
             IconUtils.CreateExtrasDirectory();
-            ImageUtils.CaptureModItemImages(modId);
+            ImageUtils.CaptureModItemImages(modId, itemAngles);
             ImageUtils.CaptureModVehicleImages(modId, vehicleAngles);
         }
 
@@ -237,6 +281,10 @@ namespace UnturnedImages.Module.UI
             _vehicleAnglesXInput = null;
             _vehicleAnglesYInput = null;
             _vehicleAnglesZInput = null;
+
+            _itemAnglesXInput = null;
+            _itemAnglesYInput = null;
+            _itemAnglesZInput = null;
         }
 
         private bool IsUnturnedUILoaded()
@@ -257,8 +305,13 @@ namespace UnturnedImages.Module.UI
 
         private void OnClickedCaptureAllItemImagesButton(ISleekElement button)
         {
+            var itemAngles = new Vector3(
+                _itemAnglesXInput?.state ?? 0,
+                _itemAnglesYInput?.state ?? 0,
+                _itemAnglesZInput?.state ?? 0);
+
             IconUtils.CreateExtrasDirectory();
-            ImageUtils.CaptureAllItemImages();
+            ImageUtils.CaptureAllItemImages(itemAngles);
         }
 
         private void OnClickedOpenExtrasFolder(ISleekElement button)
