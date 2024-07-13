@@ -1,6 +1,7 @@
 ﻿using SDG.Unturned;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace UnturnedImages.Module.Images
 {
@@ -95,7 +96,7 @@ namespace UnturnedImages.Module.Images
             var vehicle = GetVehicle(vehicleAsset);
             if (vehicle == null)
             {
-                UnturnedLog.error($"Could not get model for vehicle with ID {vehicleAsset.id}");
+                UnturnedLog.error($"Could not get model for vehicle with ID {vehicleAsset.GUID}");
                 return;
             }
 
@@ -161,14 +162,52 @@ namespace UnturnedImages.Module.Images
 
             _camera.position = cameraPosition;
 
-            Texture2D texture = CustomImageTool.CaptureIcon(vehicleAsset.id, 0, vehicle, _camera,
+            if(!vehicleAsset.IsPaintable)
+            {
+                Texture2D texture = CustomImageTool.CaptureIcon(vehicleAsset.GUID, 0, vehicle, _camera,
                 vehicleIconInfo.Width, vehicleIconInfo.Height, orthographicSize, true);
 
-            var path = $"{vehicleIconInfo.OutputPath}.png";
+                var path = $"{vehicleIconInfo.OutputPath}.png";
 
-            var bytes = texture.EncodeToPNG();
+                var bytes = texture.EncodeToPNG();
 
-            ReadWrite.writeBytes(path, false, false, bytes);
+                ReadWrite.writeBytes(path, false, false, bytes);
+            }
+            else
+            {
+                foreach(var color in vehicleAsset.DefaultPaintColors)
+                {
+                    PaintableVehicleSection[] paintableVehicleSections = vehicleAsset.PaintableVehicleSections;
+                    for (int i = 0; i < paintableVehicleSections.Length; i++)
+                    {
+                        PaintableVehicleSection paintableVehicleSection = paintableVehicleSections[i];
+                        Transform transform = vehicle.Find(paintableVehicleSection.path);
+                        if (transform == null)
+                        {
+                            Assets.reportError(vehicleAsset, "paintable section missing transform \"" + paintableVehicleSection.path + "\"");
+                            continue;
+                        }
+
+                        Renderer component = transform.GetComponent<Renderer>();
+                        if (component == null)
+                        {
+                            Assets.reportError(vehicleAsset, "paintable section missing renderer \"" + paintableVehicleSection.path + "\"");
+                            continue;
+                        }
+
+                        component.material.SetColor(Shader.PropertyToID("_PaintColor"), color);
+                    }
+
+                    Texture2D texture = CustomImageTool.CaptureIcon(vehicleAsset.GUID, 0, vehicle, _camera,
+                            vehicleIconInfo.Width, vehicleIconInfo.Height, orthographicSize, true);
+
+                    var path = $"{vehicleIconInfo.OutputPath}-{color.r}-{color.g}-{color.b}.png";
+
+                    var bytes = texture.EncodeToPNG();
+
+                    ReadWrite.writeBytes(path, false, false, bytes);
+                }
+            }
 
             _camera.SetParent(null);
             Destroy(vehicleParent.gameObject);

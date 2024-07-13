@@ -27,9 +27,11 @@ namespace UnturnedImages.Example
 
         protected override async UniTask OnExecuteAsync()
         {
-            var vehicleId = await Context.Parameters.GetAsync<ushort>(0);
+            var vehicleId = await Context.Parameters.GetAsync<string>(0);
+            if (!Guid.TryParse(vehicleId, out var guid))
+                throw new CommandWrongUsageException(Context);
 
-            var vehicleUrl = await _vehicleImageDirectory.GetVehicleImageUrlAsync(vehicleId);
+            var vehicleUrl = await _vehicleImageDirectory.GetVehicleImageUrlAsync(guid, true);
 
             if (vehicleUrl == null)
             {

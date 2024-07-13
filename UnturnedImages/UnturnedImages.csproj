@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net461</TargetFramework>
+		<TargetFramework>netstandard2.1</TargetFramework>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -28,12 +28,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net461" Version="1.0.2">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="OpenMod.Unturned" Version="3.2.0" />
-		<PackageReference Include="SilK.Unturned.Extras" Version="1.6.5" />
+		<PackageReference Include="OpenMod.Unturned" Version="3.8.10" />
+		<PackageReference Include="SilK.Unturned.Extras" Version="1.7.5" />
+    <PackageReference Include="RestoreMonarchy.UnturnedRedist" Version="3.24.4" />
 	</ItemGroup>
 
 	<ItemGroup>

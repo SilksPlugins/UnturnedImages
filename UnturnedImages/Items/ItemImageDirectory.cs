@@ -11,8 +11,10 @@ using SDG.Unturned;
 using SilK.Unturned.Extras.Configuration;
 using SilK.Unturned.Extras.Events;
 using SmartFormat;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using UnturnedImages.API.Items;
 using UnturnedImages.Configuration.Overrides;
@@ -63,14 +65,27 @@ namespace UnturnedImages.Items
 
             var itemOverridesConfig = config.Get<ItemOverridesConfig>();
 
-            foreach (var overrideConfig in itemOverridesConfig.ItemOverrides)
+            foreach (var overrideConfig in itemOverridesConfig?.ItemOverrides ?? Array.Empty<OverrideConfig>())
             {
-                var range = RangeHelper.ParseMulti(overrideConfig.Id);
+                RepositoryOverride? @override = null;
                 var repository = overrideConfig.Repository;
 
-                var @override = new RepositoryOverride(range, repository);
+                if (!string.IsNullOrWhiteSpace(overrideConfig.Id))
+                {
+                    var range = RangeHelper.ParseMulti(overrideConfig.Id);
+                    @override = new RepositoryOverride(range, repository);
+                }
+                else if (!string.IsNullOrWhiteSpace(overrideConfig.Guid) && Guid.TryParse(overrideConfig.Guid, out var guid))
+                {
+                    @override = new RepositoryOverride(guid, repository);
+                }
+                else if (!string.IsNullOrEmpty(overrideConfig.WorkshopId) && ulong.TryParse(overrideConfig.WorkshopId, out var workshopId))
+                {
+                    @override = new RepositoryOverride(workshopId.ToString(), repository);
+                }
 
-                overrides.Add(@override);
+                if (@override != null)
+                    overrides.Add(@override);
             }
 
             _defaultItemRepository = config.GetValue<string?>("DefaultRepositories:Items", null);
@@ -96,22 +111,12 @@ namespace UnturnedImages.Items
         /// <inheritdoc />
         public string? GetItemImageUrlSync(ushort id, bool includeWorkshop)
         {
-            if (!includeWorkshop)
-            {
-                // Verify item ID is not workshop
+            var asset = Assets.find(EAssetType.ITEM, id);
 
-                if (Assets.find(EAssetType.ITEM, id) is not ItemAsset itemAsset ||
-                    itemAsset.assetOrigin == EAssetOrigin.WORKSHOP)
-                {
-                    return null;
-                }
-            }
+            if (asset == null)
+                return null;
 
-            var @override = _overrideRepositories.FirstOrDefault(x => x.Range.IsWithin(id));
-
-            var repository = @override?.Repository ?? _defaultItemRepository;
-
-            return repository == null ? null : Smart.Format(repository, new { ItemId = id });
+            return GetItemImageUrlSync(asset, includeWorkshop);
         }
 
 
@@ -119,6 +124,42 @@ namespace UnturnedImages.Items
         public Task<string?> GetItemImageUrlAsync(ushort id, bool includeWorkshop)
         {
             return Task.FromResult(GetItemImageUrlSync(id, includeWorkshop));
+        }
+
+        /// <inheritdoc />
+        public Task<string?> GetItemImageUrlAsync(Guid guid, bool includeWorkshop = true)
+        {
+            return Task.FromResult(GetItemImageUrlSync(guid, includeWorkshop));
+        }
+
+        /// <inheritdoc />
+        public string? GetItemImageUrlSync(Guid guid, bool includeWorkshop = true)
+        {
+            var asset = Assets.find<ItemAsset>(guid);
+
+            if (asset == null)
+                return null;
+
+            return GetItemImageUrlSync(asset, includeWorkshop);
+        }
+
+        private static readonly FieldInfo AssetOrigin = typeof(Asset).GetField("origin", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        private string? GetItemImageUrlSync(Asset asset, bool includeWorkshop = true)
+        {
+            if (AssetOrigin.GetValue(asset) is not AssetOrigin origin)
+                return null;
+
+            if (!includeWorkshop && origin.workshopFileId != 0)
+            {
+                return null;
+            }
+
+            var @override = _overrideRepositories.FirstOrDefault(x => x.Contains(asset.GUID, asset.id, origin.workshopFileId));
+
+            var repository = @override?.Repository ?? _defaultItemRepository;
+
+            return repository == null ? null : Smart.Format(repository, new { ItemId = asset.GUID });
         }
     }
 }

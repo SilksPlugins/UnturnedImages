@@ -39,7 +39,7 @@ namespace UnturnedImages.Module.Images
             _lightComponent.enabled = false;
         }
 
-        public static Texture2D CaptureIcon(ushort id, ushort skin, Transform model, Transform icon, int width, int height, float orthoSize, bool readableOnCPU)
+        public static Texture2D CaptureIcon(Guid id, ushort skin, Transform model, Transform icon, int width, int height, float orthoSize, bool readableOnCPU)
         {
             if (_tool == null)
             {
