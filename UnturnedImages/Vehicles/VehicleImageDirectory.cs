@@ -123,7 +123,7 @@ namespace UnturnedImages.Vehicles
 
             if(asset is VehicleRedirectorAsset redirectorAsset)
             {
-                paintColor = redirectorAsset.SpawnPaintColor ?? redirectorAsset.SpawnPaintColor ?? new Color32(0,0,0,0);
+                paintColor = redirectorAsset.SpawnPaintColor ?? redirectorAsset.LoadPaintColor ?? new Color32(0,0,0,0);
             }
             else if(asset is VehicleAsset vehicleAsset && vehicleAsset.SupportsPaintColor)
             {
