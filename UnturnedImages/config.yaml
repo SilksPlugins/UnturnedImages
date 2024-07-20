@@ -11,6 +11,8 @@ DefaultRepositories:
 # Priority is based on which line is first. For example, if all lines below were uncommented,
 # the image URL for the item with an ID of 46001 would be https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/other2/items/{ItemId}.png
 ItemOverrides:
+#- WorkshoId: "3030546506" # The workshop mod you want to override
+#  Repository: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/3030546506/items/{ItemId}.png"
 #- Id: 46000 # The ID of the override.
 #  Repository: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/other/items/{ItemId}.png" # The repository of the override.
 #- Id: "46001-47000" # A range of IDs can be specified as well. You can specify multiple IDs using ranges. and multiple ranges by separating them with commas (',') or semi-colons (';').
@@ -21,5 +23,7 @@ ItemOverrides:
 # Repository overrides for vehicle images. Simply specify an ID, or list of IDs and their repository.
 # See the comments in the above ItemOverrides config for more information on configuring this.
 VehicleOverrides:
-#- Id: 46000 # The ID of the override.
+#- Guid: b1db3548447c4cde9f92d274e22f57a2 # The Guid of the override.
 #  Repository: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/other/vehicle/{VehicleId}.png" # The repository of the override.
+#- WorkshoId: "3030546506" # The workshop mod you want to override
+#  Repository: "https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/3030546506/items/{ItemId}.png"

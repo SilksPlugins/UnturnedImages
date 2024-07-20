@@ -71,44 +71,6 @@ namespace UnturnedImages.Module.Images
         private static void CaptureImages<TAsset>(
             IEnumerable<TAsset> assets, string outputCategory, Action<TAsset, string> exportAction) where TAsset : Asset
         {
-            var basePath = Path.Combine(ReadWrite.PATH, "Extras", outputCategory);
-
-            var modAssets = new Dictionary<uint, List<ushort>>();
-
-            foreach (var asset in assets)
-            {
-                string modPathSection;
-
-                if (WorkshopHelper.IsWorkshop(asset))
-                {
-                    var modId = WorkshopHelper.GetWorkshopId(asset);
-
-                    modPathSection = Path.Combine("Workshop", modId.ToString());
-
-                    if (modAssets.TryGetValue(modId, out var assetList))
-                    {
-                        assetList.Add(asset.id);
-                    }
-                    else
-                    {
-                        assetList = new List<ushort>()
-                        {
-                            asset.id
-                        };
-
-                        modAssets[modId] = assetList;
-                    }
-                }
-                else
-                {
-                    modPathSection = "Official";
-                }
-
-                var fullPath = Path.Combine(basePath, modPathSection, asset.id.ToString());
-
-                exportAction(asset, fullPath);
-            }
-
             string assetCategory;
 
             if (typeof(TAsset) == typeof(ItemAsset))
@@ -124,18 +86,54 @@ namespace UnturnedImages.Module.Images
                 throw new ArgumentException($"Generic type {nameof(TAsset)} is not item or vehicle.");
             }
 
+            var basePath = Path.Combine(ReadWrite.PATH, "Extras", outputCategory);
+
+            var modAssets = new Dictionary<ulong, List<Guid>>();
+
+            foreach (var asset in assets)
+            {
+                string modPathSection;
+
+                if (WorkshopHelper.IsWorkshop(asset))
+                {
+                    var modId = WorkshopHelper.GetWorkshopId(asset);
+
+                    modPathSection = Path.Combine("Workshop", modId.ToString());
+
+                    if (modAssets.TryGetValue(modId, out var assetList))
+                    {
+                        assetList.Add(asset.GUID);
+                    }
+                    else
+                    {
+                        assetList = new List<Guid>()
+                        {
+                            asset.GUID
+                        };
+
+                        modAssets[modId] = assetList;
+                    }
+                }
+                else
+                {
+                    modPathSection = "Official";
+                }
+
+                var fullPath = Path.Combine(basePath, modPathSection, asset.GUID.ToString());
+
+                exportAction(asset, fullPath);
+            }
+
             foreach (var pair in modAssets)
             {
                 var modId = pair.Key;
                 var assetIds = pair.Value;
 
-                var idRanges = GenerateIdRanges(assetIds);
-
                 var directory = Path.Combine(basePath, "Workshop", modId.ToString());
                 var fullPath = Path.Combine(directory, "config.yaml");
 
                 UnturnedLog.info(fullPath);
-                UnturnedLog.info("ID Ranges: " + idRanges);
+                UnturnedLog.info("WorkshopMod: " + pair.Key);
 
                 if (!Directory.Exists(directory))
                 {
@@ -146,8 +144,8 @@ namespace UnturnedImages.Module.Images
 
                 streamWriter.Write($@"
 # Use this in your UnturnedImages/config.yaml file
-- Id: ""{idRanges}"" # The ID of the override.
-  Repository: ""https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/{modId}/{assetCategory}/{{ItemId}}.png"" # The repository of the override.
+- WorkshopId: ""{pair.Key}"" # The ID of the override.
+  Repository: ""https://cdn.jsdelivr.net/gh/SilKsPlugins/UnturnedIcons@images/modded/{modId}/{assetCategory}/{{{(assetCategory == "items" ? "ItemId" : "VehicleId")}}}.png"" # The repository of the override.
                 ".Trim());
             }
         }
@@ -190,30 +188,39 @@ namespace UnturnedImages.Module.Images
 
         public static void CaptureAllVehicleImages(Vector3? vehicleAngles = null)
         {
-            var vehicleAssets = Assets.find(EAssetType.VEHICLE).OfType<VehicleAsset>();
+            List<VehicleAsset> vehicleAssets = new List<VehicleAsset>();
+            Assets.find(vehicleAssets);
 
             CaptureVehicleImages(vehicleAssets, vehicleAngles);
         }
 
         public static void CaptureAllItemImages(Vector3? itemAngles = null)
         {
-            var itemAssets = Assets.find(EAssetType.ITEM).OfType<ItemAsset>().ToList();
+            List<ItemAsset> itemAssets = new List<ItemAsset>();
+            Assets.find(itemAssets);
 
             CaptureItemImages(itemAssets, itemAngles);
         }
 
-        public static void CaptureModItemImages(uint mod, Vector3? itemAngles = null)
+        public static void CaptureModItemImages(ulong mod, Vector3? itemAngles = null)
         {
-            var itemAssets = Assets.find(EAssetType.ITEM).OfType<ItemAsset>()
-                .Where(x => WorkshopHelper.GetWorkshopIdSafe(x) == mod);
+            List<ItemAsset> itemAssets = new List<ItemAsset>();
+            Assets.find(itemAssets);
+
+            itemAssets = itemAssets
+                .Where(x => WorkshopHelper.GetWorkshopIdSafe(x) == mod).ToList();
 
             CaptureItemImages(itemAssets, itemAngles);
         }
 
-        public static void CaptureModVehicleImages(uint mod, Vector3? vehicleAngles = null)
+        public static void CaptureModVehicleImages(ulong mod, Vector3? vehicleAngles = null)
         {
-            var vehicleAssets = Assets.find(EAssetType.VEHICLE).OfType<VehicleAsset>()
-                .Where(x => WorkshopHelper.GetWorkshopIdSafe(x) == mod);
+            List<VehicleAsset> vehicleAssets = new List<VehicleAsset>();
+            Assets.find(vehicleAssets);
+
+            vehicleAssets = vehicleAssets
+                .Where(x => WorkshopHelper.GetWorkshopIdSafe(x) == mod).ToList();
+
 
             CaptureVehicleImages(vehicleAssets, vehicleAngles);
         }

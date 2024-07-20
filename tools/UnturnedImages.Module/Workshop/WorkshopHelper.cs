@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace UnturnedImages.Module.Workshop
 {
@@ -9,46 +10,39 @@ namespace UnturnedImages.Module.Workshop
     {
         private const string WorkshopPathIndicator = "steamapps/workshop/content/304930/";
 
+        private static readonly FieldInfo AssetOrigin = typeof(Asset).GetField("origin", BindingFlags.Instance | BindingFlags.NonPublic);
+
         public static bool IsWorkshop(Asset asset)
         {
-            return asset.assetOrigin == EAssetOrigin.WORKSHOP ||
-                   asset.absoluteOriginFilePath.Contains(WorkshopPathIndicator);
+            var origin = AssetOrigin.GetValue(asset);
+
+            return origin is AssetOrigin assetOrigin && assetOrigin.workshopFileId != 0;
         }
 
-        public static uint GetWorkshopId(Asset asset)
+        public static ulong GetWorkshopId(Asset asset)
         {
-            var originFilePath = asset.absoluteOriginFilePath.Replace('\\', '/');
+            var origin = AssetOrigin.GetValue(asset);
 
-            var index = originFilePath.IndexOf(WorkshopPathIndicator, StringComparison.Ordinal);
-
-            if (index < 0)
-            {
-                throw new Exception($"Workshop ID could not be found for asset {asset.id} ({asset.assetCategory}) ({asset.absoluteOriginFilePath})");
-            }
-
-            var cutStr = originFilePath.Substring(index + WorkshopPathIndicator.Length);
-
-            var workshopIdStr = new string(cutStr.TakeWhile(char.IsNumber).ToArray());
-
-            if (!uint.TryParse(workshopIdStr, out var workshopId))
-            {
-                throw new Exception($"Workshop ID could not be parsed for asset {asset.id} ({asset.assetCategory}) ({asset.absoluteOriginFilePath})");
-            }
-
-            return workshopId;
+            return origin is AssetOrigin assetOrigin ? assetOrigin.workshopFileId : 0;
         }
 
-        public static uint GetWorkshopIdSafe(Asset asset)
+        public static ulong GetWorkshopIdSafe(Asset asset)
         {
-            return !IsWorkshop(asset) ? 0 : GetWorkshopId(asset);
+            return GetWorkshopId(asset);
         }
 
-        public static uint[] GetAllMods()
+        public static ulong[] GetAllMods()
         {
-            var mods = new List<uint>();
+            var mods = new List<ulong>();
 
-            mods.AddRange(Assets.find(EAssetType.ITEM).Select(GetWorkshopIdSafe).Distinct());
-            mods.AddRange(Assets.find(EAssetType.VEHICLE).Select(GetWorkshopIdSafe).Distinct());
+            List<ItemAsset> itemAssets = new List<ItemAsset>();
+            List<VehicleAsset> vehicleAssets = new List<VehicleAsset>();
+
+            Assets.find(itemAssets);
+            Assets.find(vehicleAssets);
+
+            mods.AddRange(itemAssets.Select(GetWorkshopIdSafe).Distinct());
+            mods.AddRange(vehicleAssets.Select(GetWorkshopIdSafe).Distinct());
 
             return mods.Distinct().ToArray();
         }

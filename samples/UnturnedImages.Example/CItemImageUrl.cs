@@ -27,9 +27,11 @@ namespace UnturnedImages.Example
 
         protected override async UniTask OnExecuteAsync()
         {
-            var itemId = await Context.Parameters.GetAsync<ushort>(0);
+            var itemId = await Context.Parameters.GetAsync<string>(0);
+            if (!Guid.TryParse(itemId, out var guid))
+                throw new CommandWrongUsageException(Context);
 
-            var itemUrl = await _itemImageDirectory.GetItemImageUrlAsync(itemId);
+            var itemUrl = await _itemImageDirectory.GetItemImageUrlAsync(guid);
 
             if (itemUrl == null)
             {
