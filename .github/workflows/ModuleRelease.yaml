@@ -34,7 +34,7 @@ jobs:
       
     - name: Zip release
       run: |
-        cd "./tools/UnturnedImages.Module/bin/Release/net461"
+        cd "./tools/UnturnedImages.Module/bin/Release/net48"
         mkdir UnturnedImages
         mv *.dll UnturnedImages
         mv *.module UnturnedImages
