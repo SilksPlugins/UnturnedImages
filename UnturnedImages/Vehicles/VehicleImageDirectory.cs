@@ -1,6 +1,5 @@
 ﻿extern alias JetBrainsAnnotations;
 using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Triggers;
 using JetBrainsAnnotations::JetBrains.Annotations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnturnedImages.API.Vehicles;
@@ -114,23 +112,12 @@ namespace UnturnedImages.Vehicles
         /// <inheritdoc />
         public string? GetVehicleImageUrlSync(ushort id, bool includeWorkshop)
         {
-            var asset = Assets.find(EAssetType.VEHICLE, id);
+            var asset = GetVehicleAsset(id, out var color);
 
             if (asset == null)
                 return null;
 
-            Color32 paintColor = new Color(0,0,0,0);
-
-            if(asset is VehicleRedirectorAsset redirectorAsset)
-            {
-                paintColor = redirectorAsset.SpawnPaintColor ?? redirectorAsset.LoadPaintColor ?? new Color32(0,0,0,0);
-            }
-            else if(asset is VehicleAsset vehicleAsset && vehicleAsset.SupportsPaintColor)
-            {
-                paintColor = vehicleAsset.DefaultPaintColors[0];
-            }
-
-            return GetVehicleImageUrlSync(asset.GUID, paintColor, includeWorkshop);
+            return GetVehicleImageUrlSync(asset, color, includeWorkshop);
         }
 
 
@@ -155,13 +142,18 @@ namespace UnturnedImages.Vehicles
         /// <inheritdoc />
         public string? GetVehicleImageUrlSync(Guid guid, bool includeWorkshop = true)
         {
-            return GetVehicleImageUrlSync(guid, new Color32(0, 0, 0, 0), includeWorkshop);
+            var asset = GetVehicleAsset(guid, out var color);
+
+            if (asset == null)
+                return null;
+
+            return GetVehicleImageUrlSync(asset, color, includeWorkshop);
         }
 
         /// <inheritdoc />
         public string? GetVehicleImageUrlSync(Guid guid, Color32 paintColor,bool includeWorkshop = true)
         {
-            var asset = Assets.find<VehicleAsset>(guid);
+            var asset = GetVehicleAsset(guid, out _);
 
             if (asset == null)
                 return null;
@@ -171,7 +163,7 @@ namespace UnturnedImages.Vehicles
 
         private static readonly FieldInfo AssetOrigin = typeof(Asset).GetField("origin", BindingFlags.Instance | BindingFlags.NonPublic);
 
-        private string? GetVehicleImageUrlSync(VehicleAsset asset, Color32 paintColor, bool includeWorkshop = true)
+        private string? GetVehicleImageUrlSync(VehicleAsset asset, Color32? paintColor, bool includeWorkshop = true)
         {
             if (AssetOrigin.GetValue(asset) is not AssetOrigin origin)
                 return null;
@@ -187,12 +179,57 @@ namespace UnturnedImages.Vehicles
 
             string id = asset.GUID.ToString();
 
-            if(paintColor.r != 0 || paintColor.g != 0 || paintColor.b != 0)
+            // if paint color is null use 0 default paint color
+            // if paint color is not null but not valid use 0 paint color
+            if((paintColor == null && asset.SupportsPaintColor) ||
+                (asset.SupportsPaintColor && paintColor != null && !asset.DefaultPaintColors.Any(x => x.r == paintColor.Value.r && x.g == paintColor.Value.g && x.b == paintColor.Value.b)))
             {
-                id += $"-{paintColor.r}-{paintColor.g}-{paintColor.b}";
+                paintColor = asset.DefaultPaintColors[0];
+            }
+
+            if(paintColor != null)
+            {
+                id += $"-{paintColor.Value.r}-{paintColor.Value.g}-{paintColor.Value.b}";
             }
 
             return repository == null ? null : Smart.Format(repository, new { VehicleId = id });
+        }
+
+        private VehicleAsset? GetVehicleAsset(ushort id, out Color32? color)
+        {
+            var asset = Assets.find(EAssetType.VEHICLE, id);
+
+            if (asset == null)
+            {
+                color = null;
+                return null;
+            }
+
+            return GetVehicleAsset(asset.GUID, out color);
+        }
+
+        private VehicleAsset? GetVehicleAsset(Guid guid, out Color32? color)
+        {
+            var asset = Assets.find(guid);
+            color = null;
+
+            if (asset is VehicleAsset vehicleAsset)
+            {
+                return vehicleAsset;
+            }
+
+            if (asset is RedirectorAsset redirectorAsset)
+            {
+                return Assets.find<VehicleAsset>(redirectorAsset.TargetGuid);
+            }
+
+            if(asset is VehicleRedirectorAsset vehicleRedirectorAsset)
+            {
+                color = vehicleRedirectorAsset.LoadPaintColor ?? vehicleRedirectorAsset.SpawnPaintColor;
+                return vehicleRedirectorAsset.TargetVehicle.Find();
+            }
+
+            return null;
         }
     }
 }

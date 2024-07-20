@@ -111,10 +111,20 @@ namespace UnturnedImages.Items
         /// <inheritdoc />
         public string? GetItemImageUrlSync(ushort id, bool includeWorkshop)
         {
-            var asset = Assets.find(EAssetType.ITEM, id);
+            var asset = GetItemAsset(id);
 
             if (asset == null)
                 return null;
+
+            return GetItemImageUrlSync(asset, includeWorkshop);
+        }
+
+        /// <inheritdoc />
+        public string? GetItemImageUrlSync(Guid guid, bool includeWorkshop = true)
+        {
+            var asset = GetItemAsset(guid);
+
+            if (asset == null) return null;
 
             return GetItemImageUrlSync(asset, includeWorkshop);
         }
@@ -130,17 +140,6 @@ namespace UnturnedImages.Items
         public Task<string?> GetItemImageUrlAsync(Guid guid, bool includeWorkshop = true)
         {
             return Task.FromResult(GetItemImageUrlSync(guid, includeWorkshop));
-        }
-
-        /// <inheritdoc />
-        public string? GetItemImageUrlSync(Guid guid, bool includeWorkshop = true)
-        {
-            var asset = Assets.find<ItemAsset>(guid);
-
-            if (asset == null)
-                return null;
-
-            return GetItemImageUrlSync(asset, includeWorkshop);
         }
 
         private static readonly FieldInfo AssetOrigin = typeof(Asset).GetField("origin", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -160,6 +159,32 @@ namespace UnturnedImages.Items
             var repository = @override?.Repository ?? _defaultItemRepository;
 
             return repository == null ? null : Smart.Format(repository, new { ItemId = asset.GUID });
+        }
+
+        private ItemAsset? GetItemAsset(ushort id)
+        {
+            var asset = Assets.find(EAssetType.ITEM, id);
+
+            if(asset == null) return null;
+
+            return GetItemAsset(asset.GUID);
+        }
+
+        private ItemAsset? GetItemAsset(Guid guid)
+        {
+            var asset = Assets.find(guid);
+
+            if(asset is ItemAsset itemAsset)
+            {
+                return itemAsset;
+            }
+
+            if(asset is RedirectorAsset redirectorAsset)
+            {
+                return Assets.find<ItemAsset>(redirectorAsset.TargetGuid);
+            }
+
+            return null;
         }
     }
 }

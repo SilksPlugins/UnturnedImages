@@ -162,7 +162,7 @@ namespace UnturnedImages.Module.Images
 
             _camera.position = cameraPosition;
 
-            if(!vehicleAsset.IsPaintable)
+            if(!vehicleAsset.SupportsPaintColor)
             {
                 Texture2D texture = CustomImageTool.CaptureIcon(vehicleAsset.GUID, 0, vehicle, _camera,
                 vehicleIconInfo.Width, vehicleIconInfo.Height, orthographicSize, true);
